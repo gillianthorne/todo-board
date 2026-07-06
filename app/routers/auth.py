@@ -16,3 +16,7 @@ def login(request: Request, credentials: LoginRequest):
         raise HTTPException(status_code=401, detail="Incorrect password.")
 
 
+@router.post("/logout")
+def logout(request: Request):
+    request.session.clear()
+    return {"message": "Logged out successfully"}

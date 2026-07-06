@@ -1,3 +1,6 @@
 sqlalchemy
 fastapi
 uvicorn
+itsdangerous
+bcrypt
+python-decouple

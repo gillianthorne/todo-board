@@ -1,7 +1,8 @@
 from starlette.middleware.sessions import SessionMiddleware
 from decouple import config
-from fastapi import FastAPI
+from fastapi import APIRouter, Depends, FastAPI
 
+from app.deps import require_auth
 from app.routers import auth
 
 app = FastAPI()

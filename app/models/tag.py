@@ -1,0 +1,11 @@
+from sqlalchemy import String
+from app.database import Base
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+class Tag(Base):
+    __tablename__ = "tags"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    tag_name: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
+
+    tasks: Mapped[list["Task"]] = relationship(secondary="task_tags", back_populates="tags")

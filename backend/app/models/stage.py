@@ -13,7 +13,6 @@ class Stage(Base):
     stage_name: Mapped[str] = mapped_column(String(255), nullable=False)
     stage_position: Mapped[int] = mapped_column(nullable=False)
     colour: Mapped[Optional[str]] = mapped_column(String(6), nullable=True)
-    position: Mapped[int] = mapped_column(nullable=False)
 
     board: Mapped["Board"] = relationship(back_populates="stages")
     tasks: Mapped[list["Task"]] = relationship(back_populates="stage")

@@ -4,3 +4,4 @@ uvicorn
 itsdangerous
 bcrypt
 python-decouple
+pymysql

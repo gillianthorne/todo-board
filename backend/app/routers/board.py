@@ -4,8 +4,9 @@ from app.crud.board import create_board, delete_board, get_board, get_boards, up
 from app.database import get_db
 from app.models.board import Board
 from app.schemas.board import BoardCreate, BoardRead, BoardUpdate
+from app.deps import require_auth
 
-router = APIRouter(prefix="/boards")
+router = APIRouter(prefix="/boards", dependencies=[Depends(require_auth)])
 
 def get_board_or_404(board_id: int, db: Session = Depends(get_db)):
     board = get_board(db, board_id)

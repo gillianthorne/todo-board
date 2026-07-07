@@ -13,7 +13,7 @@ def create_board(db: Session, board_in: BoardCreate) -> Board:
     return new_board
 
 def get_boards(db: Session) -> list[Board]:
-    boards = db.execute(select(Board)).scalars.all()
+    boards = db.execute(select(Board)).scalars().all()
     return boards
 
 def get_board(db: Session, board_id: int) -> Board | None:

@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.deps import require_auth
-from app.routers import auth, board, stage
+from app.routers import auth, board, stage, task
 
 # Check if you are in production or local development
 IS_PRODUCTION = config('ENVIRONMENT', default='development') == 'production'
@@ -30,3 +30,4 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(board.router)
 app.include_router(stage.router)
+app.include_router(task.router)

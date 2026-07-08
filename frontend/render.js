@@ -34,7 +34,19 @@ function renderStage(stageData) {
     return stage
 }
 
+function renderHeader(board) {
+    const header = document.querySelector("header");
+    header.replaceChildren()
+
+    const h1 = document.createElement("h1");
+    h1.textContent = board.board_name;
+    header.appendChild(h1);
+
+    return header;
+}
+
 export { 
     renderBoardTabs,
-    renderStage
+    renderStage,
+    renderHeader
 }

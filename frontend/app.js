@@ -1,10 +1,10 @@
-import { renderStage, renderBoardTabs } from "./render.js";
-import { getStages, getBoards } from "./api.js";
+import { renderStage, renderBoardTabs, renderHeader } from "./render.js";
+import { getStages, getBoards, getIndividualBoard } from "./api.js";
 
 let currentBoardId = null;
 const stagesContainer = document.querySelector('#stages-container');
 const boardSelect = document.querySelector('#board-select');
-const main = document.querySelector('main');
+const bodyTag = document.querySelector('body');
 
 // https://stackoverflow.com/a/6211716
 const addCSS = css => document.head.appendChild(document.createElement("style")).innerHTML = css;
@@ -18,24 +18,29 @@ boardSelect.addEventListener('click', (e) => {
 })
 
 async function loadBoard(boardId) {
-    main.id = `board-${currentBoardId}`
+    bodyTag.id = `board-${currentBoardId}`
+    const board = await getIndividualBoard(boardId);
+    renderHeader(board);
     const stages = await getStages(boardId);
     stagesContainer.replaceChildren();
     stages.forEach((stage) => {
         stagesContainer.appendChild(renderStage(stage));
-        createStageStyles(stage.id, stage.colour ?? "FFFFFF")
+        createStageStyles(stage.id, stage.colour ?? "FFFFFF");
     })
 }
 
 
 
 function createStageStyles(stageId, colour) {
-    addCSS(`#stage-${stageId} .stage-details { background-color: #${colour} }`);
+    addCSS(`#stage-${stageId} { color: contrast-color(#${colour}) }`)
+    addCSS(`#stage-${stageId} .stage-details { background-color: #${colour}; color: contrast-color(#${colour}) }`);
 }
 function createBoardStyles(boardId, colour) {
-    addCSS(`#board-${boardId} { background-color: #${colour} }`);
+    addCSS(`#board-${boardId} { background-color: #${colour}; color: contrast-color(#${colour})  }`);
     console.log(colour)
-    addCSS(`button[data-board-id="${boardId}"] { background-color: #${colour} }`);
+    addCSS(`button[data-board-id="${boardId}"] { background-color: #${colour}; color: contrast-color(#${colour}) }`);
+    addCSS(`button[data-board-id="${boardId}"]:hover, button[data-board-id="${boardId}"]:active { background-color: color-mix(in srgb, #${colour} 60%, black) `)
+    // color-mix(in srgb, #3498DB 0%, black)
 }
 
 async function init() {

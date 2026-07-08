@@ -49,10 +49,8 @@ def delete_stage(db: Session, stage: Stage) -> None:
 
     remaining_stages = db.execute(select(Stage).where(Stage.board_id == stage.board_id).order_by(Stage.stage_position)).scalars().all()
 
-    current_pos = 0
-    for s in remaining_stages:
-        s.stage_position = current_pos
-        current_pos += 1
+    for index, s in enumerate(remaining_stages):
+        s.stage_position = index
 
     db.commit()
 
@@ -68,4 +66,7 @@ def reorder_stages(db: Session, board_id: int, stage_ids: list[int]) -> list[Sta
     
     db.commit()
 
-    return current_stages
+    refreshed_stages = db.execute(select(Stage).where(Stage.board_id == board_id).order_by(Stage.stage_position)).scalars().all()
+
+
+    return refreshed_stages

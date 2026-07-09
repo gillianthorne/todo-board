@@ -3,8 +3,8 @@ from sqlalchemy.orm import Session
 
 from app.deps import require_auth
 from app.database import get_db
-from app.crud.task import create_task, delete_task, get_task, get_tasks, reorder_tasks, update_task
-from app.schemas.task import TaskCreate, TaskRead, TaskReorder, TaskUpdate
+from app.crud.task import create_task, delete_task, get_task, get_tasks, move_task_state, reorder_tasks, update_task
+from app.schemas.task import TaskCreate, TaskMove, TaskRead, TaskReorder, TaskUpdate
 from app.models.task import Task
 from app.routers.stage import get_stage_or_404
 
@@ -32,6 +32,10 @@ def get_task_route(task: Task = Depends(get_task_or_404)):
 @router.patch("/{task_id}", response_model=TaskRead)
 def update_task_route(task_in: TaskUpdate, task: Task = Depends(get_task_or_404), db: Session = Depends(get_db)):
     return update_task(db, task, task_in)
+
+@router.patch("/{task_id}/stage", response_model=TaskRead)
+def move_task_state_route(move_in: TaskMove, task: Task = Depends(get_task_or_404), db: Session = Depends(get_db)):
+    return move_task_state(db, task, move_in.new_stage_id)
 
 @router.delete("/{task_id}", status_code=204)
 def delete_task_route(task: Task = Depends(get_task_or_404), db: Session = Depends(get_db)):

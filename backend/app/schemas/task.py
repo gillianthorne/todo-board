@@ -36,3 +36,6 @@ class TaskRead(BaseModel):
 
 class TaskReorder(BaseModel):
     task_ids: list[int]
+
+class TaskMove(BaseModel):
+    new_stage_id: int

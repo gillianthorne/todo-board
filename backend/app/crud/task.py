@@ -77,3 +77,31 @@ def reorder_tasks(db: Session, stage_id: int, task_ids: list[int]) -> list[Task]
     refreshed_tasks = db.execute(select(Task).where(Task.stage_id == stage_id).order_by(Task.task_position)).scalars().all()
 
     return refreshed_tasks
+
+def move_task_state(db: Session, task: Task, new_stage_id: int) -> Task:
+    old_stage_id = task.stage_id
+    new_tasks = db.execute(select(Task).where(Task.stage_id == new_stage_id).order_by(Task.task_position)).scalars().all()
+
+    if not new_tasks:
+        position = 0
+    else:
+        position = max(task.task_position for task in new_tasks) + 1
+
+    task.stage_id = new_stage_id
+    task.task_position = position
+
+    db.commit()
+    db.refresh(task)
+
+    old_tasks = db.execute(select(Task).where(Task.stage_id == old_stage_id).order_by(Task.task_position)).scalars().all()
+
+    for index, t in enumerate(old_tasks):
+        t.task_position = index
+
+    db.commit()
+    
+    return task
+
+
+    
+    

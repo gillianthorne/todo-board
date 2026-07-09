@@ -18,6 +18,7 @@ class Task(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     completed_at: Mapped[Optional[datetime]] = mapped_column(DateTime)
     is_complete: Mapped[bool] = mapped_column(Boolean, nullable=False, server_default="0")
+    colour: Mapped[Optional[str]] = mapped_column(String(6), nullable=True)
 
     stage: Mapped["Stage"] = relationship(back_populates="tasks")
     recurring_template: Mapped[Optional["RecurringTemplate"]] = relationship(back_populates="tasks")

@@ -98,6 +98,47 @@ async function reorderStages(boardId, stageIds) {
     return data;
 }
 
+// --- TASK FUNCTIONS ---
+// create
+async function createTask(boardId, stageId, body) {
+    const data = await apiFetch(`/boards/${boardId}/stages/${stageId}/tasks`, "POST", body);
+    return data;
+}
+
+// read
+async function getTasks(boardId, stageId) {
+    const data = await apiFetch(`/boards/${boardId}/stages/${stageId}/tasks`, "GET");
+    return data;
+}
+
+async function getIndividualTask(boardId, stageId, taskId) {
+    const data = await apiFetch(`/boards/${boardId}/stages/${stageId}/tasks/${taskId}`, "GET");
+    return data;
+}
+
+// update
+async function updateTask(boardId, stageId, taskId, body) {
+    const data = await apiFetch(`/boards/${boardId}/stages/${stageId}/tasks/${taskId}`, "PATCH", body);
+    return data
+}
+
+// delete
+async function deleteTask(boardId, stageId, taskId) {
+    const data = await apiFetch(`/boards/${boardId}/stages/${stageId}/tasks/${taskId}`, "DELETE");
+    return data;
+}
+
+// special functions
+async function reorderTasks(boardId, stageId, taskIds) {
+    const data = await apiFetch(`/boards/${boardId}/stages/${stageId}/tasks`, "PUT", { task_ids: taskIds });
+    return data;
+}
+
+async function moveTasks(boardId, stageId, taskId, body) {
+    const data = await apiFetch(`/boards/${boardId}/stages/${stageId}/tasks/${taskId}/stage`, "PATCH", body);
+    return data;
+}
+
 export { 
     createBoard, 
     getBoards, 
@@ -109,5 +150,11 @@ export {
     getIndividualStage, 
     updateStage, 
     deleteStage, 
-    reorderStages
+    reorderStages,
+    createTask,
+    getTasks,
+    getIndividualTask,
+    updateTask,
+    deleteTask,
+    reorderTasks
 }

@@ -1,5 +1,5 @@
 import { renderStage, renderBoardTabs, renderHeader } from "./render.js";
-import { getStages, getBoards, getIndividualBoard } from "./api.js";
+import { getStages, getBoards, getIndividualBoard, getTasks } from "./api.js";
 
 let currentBoardId = null;
 const stagesContainer = document.querySelector('#stages-container');
@@ -23,13 +23,14 @@ async function loadBoard(boardId) {
     renderHeader(board);
     const stages = await getStages(boardId);
     stagesContainer.replaceChildren();
-    stages.forEach((stage) => {
-        stagesContainer.appendChild(renderStage(stage));
+
+    // can't use forEach with await because if i "async forEach..." it renders them out of order
+    for (const stage of stages) {
+        const tasks = await getTasks(boardId, stage.id);
+        stagesContainer.append(renderStage(stage, tasks));
         createStageStyles(stage.id, stage.colour ?? "FFFFFF");
-    })
+    }
 }
-
-
 
 function createStageStyles(stageId, colour) {
     addCSS(`#stage-${stageId} { color: contrast-color(#${colour}) }`)
@@ -40,7 +41,6 @@ function createBoardStyles(boardId, colour) {
     console.log(colour)
     addCSS(`button[data-board-id="${boardId}"] { background-color: #${colour}; color: contrast-color(#${colour}) }`);
     addCSS(`button[data-board-id="${boardId}"]:hover, button[data-board-id="${boardId}"]:active { background-color: color-mix(in srgb, #${colour} 60%, black) `)
-    // color-mix(in srgb, #3498DB 0%, black)
 }
 
 async function init() {

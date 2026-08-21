@@ -7,7 +7,6 @@ function renderBoardTabs(boards) {
         btn.textContent = board.board_name;
         newDiv.appendChild(btn);
     })
-
     return newDiv;
 }
 
@@ -42,6 +41,16 @@ function renderHeader(board) {
     const h1 = document.createElement("h1");
     h1.textContent = board.board_name;
     header.appendChild(h1);
+
+    const addBoard = document.createElement("button");
+    addBoard.textContent = "Add board";
+    addBoard.id = "addBoard";
+    header.appendChild(addBoard);
+
+    const editBoard = document.createElement("button");
+    editBoard.textContent = "Edit board";
+    editBoard.id = "editBoard";
+    header.appendChild(editBoard);
 
     return header;
 }
@@ -87,10 +96,12 @@ function renderTask(task) {
 }
 
 function renderFormTemplate(renderFormContent) {
+    const dialog = document.createElement("dialog");
     const form = document.createElement("form");
     form.method = "dialog";
     
     const content = renderFormContent();
+    console.log(content);
     form.appendChild(content)
 
     const formActions = document.createElement("div");
@@ -109,10 +120,14 @@ function renderFormTemplate(renderFormContent) {
     formActions.appendChild(submitBtn);
     form.appendChild(formActions);
 
-    return form;
+    dialog.append(form);
+
+    return dialog;
 }
 
 function renderBoardForm(board = null) {
+    console.log(board);
+
     const container = document.createElement("div")
 
     const titleLabel = document.createElement("label");
@@ -124,8 +139,9 @@ function renderBoardForm(board = null) {
     titleInput.name = "title";
     titleInput.required = true;
     // "board?" means "don't throw me an error if there isn't a board while checking to see if there's a title on the board"
-    // so basically: if no board return "", if board yes return title unless there isn't one then ""
-    titleInput.value = board?.title ?? "";
+    // so basically: if no board return "", if yes board return title unless there isn't one then ""
+    titleInput.value = board?.board_name ?? "";
+    console.log(board?.title);
     
     container.appendChild(titleLabel);
     container.appendChild(titleInput);
@@ -179,6 +195,8 @@ function renderStageForm(stage = null) {
 function renderTaskForm(task = null) {
     const container = document.createElement("div");
 
+    // i'll figure out how to add a stage select later - maybe i have to have a "select board" and then "select stage"?? 
+
     const titleLabel = document.createElement("label");
     titleLabel.htmlFor = "title";
     titleLabel.textContent = "Title: ";
@@ -193,15 +211,46 @@ function renderTaskForm(task = null) {
     container.appendChild(titleInput);
 
     const taskDescriptionLabel = document.createElement("label");
-    taskDescriptionLabel.htmlFor = "task_description";
+    taskDescriptionLabel.htmlFor = "description";
     taskDescriptionLabel.textContent = "Description:";
     const taskDescriptionInput = document.createElement("textarea");
-    taskDescriptionInput.name = "task_description";
-    taskDescriptionInput.id = "task_description";
+    taskDescriptionInput.name = "description";
+    taskDescriptionInput.id = "description";
     taskDescriptionInput.maxLength = 1000;
     taskDescriptionInput.textContent = task?.description ?? "";
 
-    
+    container.appendChild(taskDescriptionLabel);
+    container.appendChild(taskDescriptionInput);
+
+    const deadlineLabel = document.createElement("label");
+    deadlineLabel.htmlFor = "deadline";
+    deadlineLabel.textContent = "Deadline:";
+    const deadlineInput = document.createElement("input");
+    deadlineInput.name = "deadline";
+    deadlineInput.id = "deadline";
+    deadlineInput.type = "date";
+    deadlineInput.value = task?.deadline ?? "";
+
+    container.appendChild(deadlineLabel);
+    container.appendChild(deadlineInput);
+
+    const completionLabel = document.createElement("label");
+    completionLabel.htmlFor = "complete";
+    completionLabel.textContent = "Complete?";
+    const completionInput = document.createElement("input");
+    completionInput.name = "complete";
+    completionInput.id = "complete";
+    completionInput.type = "checkbox";
+    completionInput.checked = task?.is_complete ?? false;
+
+    container.appendChild(completionLabel);
+    container.appendChild(completionInput);
+
+    // add parent task option in m6
+    // add tags in m5
+    // add recurrence functionality in m10
+
+    return container;
 }
 
 export { 
@@ -211,5 +260,6 @@ export {
     renderTask,
     renderFormTemplate,
     renderBoardForm,
-    renderStageForm
+    renderStageForm,
+    renderTaskForm
 }

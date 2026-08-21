@@ -23,9 +23,9 @@ async function apiFetch(url, method, body) {
         let errMsg = ""
         try {
             const errBody = await response.json();
-            errMsg = errCode + ": " + errBody.detail;
+            errMsg = errCode + ": " + errBody.detail.toString();
         } catch {
-            errMsg = errCode;
+            errMsg = errCode.toString();
         }
         throw new Error(`Response failed with error code ${errMsg}`)
 
@@ -52,6 +52,7 @@ async function getIndividualBoard(boardId) {
 
 // update
 async function updateBoard(boardId, body) {
+    console.log(body)
     const data = await apiFetch(`/boards/${boardId}`, "PATCH", body);
     return data;
 }

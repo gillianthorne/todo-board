@@ -31,6 +31,24 @@ function renderStage(stageData, tasks) {
     tasks.forEach((task) => stageContent.append(renderTask(task)))
     stage.append(stageContent)
 
+    const buttons = document.createElement("div");
+    const editStage = document.createElement("button");
+    editStage.textContent = "Edit stage";
+    editStage.classList.add("editStageBtn");
+    editStage.dataset.stageId = stageData.id;
+    buttons.appendChild(editStage);
+    const deleteStage = document.createElement("button");
+    deleteStage.textContent = "Delete stage";
+    deleteStage.classList.add("deleteStageBtn");
+    deleteStage.dataset.stageId = stageData.id;
+    buttons.appendChild(deleteStage);
+    const addTask = document.createElement("button");
+    addTask.textContent = "Add task";
+    addTask.classList.add("addTaskBtn");
+    addTask.dataset.stageId = stageData.id;
+    buttons.append(addTask);
+    stage.append(buttons)
+
     return stage
 }
 
@@ -52,6 +70,18 @@ function renderHeader(board) {
     editBoard.id = "editBoard";
     header.appendChild(editBoard);
 
+    const deleteBoard = document.createElement("button");
+    deleteBoard.textContent = "Delete board";
+    deleteBoard.id = "deleteBoard";
+    header.appendChild(deleteBoard);
+
+    const addStage = document.createElement("button");
+    addStage.textContent = "Add stage";
+    addStage.id = "addStage";
+    header.appendChild(addStage);
+
+    
+
     return header;
 }
 
@@ -59,6 +89,7 @@ function renderTask(task) {
     console.log(task)
     const taskContainer = document.createElement("div");
     taskContainer.id = `task-${task.id}`;
+    taskContainer.classList.add("task");
     if (task.is_complete) taskContainer.classList.add("finished");
     task.parent_task_id ? taskContainer.classList.add("subtask") : taskContainer.classList.add("task")
     
@@ -92,7 +123,46 @@ function renderTask(task) {
         taskContainer.appendChild(recurrance);
     }
 
+    const buttons = document.createElement("div");
+
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "Edit task";
+    editBtn.classList.add("editTask");
+    editBtn.dataset.taskId = task.id;
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "Delete task";
+    deleteBtn.classList.add("deleteTask");
+    deleteBtn.dataset.taskId = task.id;
+
+    buttons.appendChild(editBtn);
+    buttons.appendChild(deleteBtn);
+    
+    taskContainer.appendChild(buttons);
+
     return taskContainer
+}
+
+function renderDeleteAlert(type, title) {
+    const dialog = document.createElement("dialog");
+    
+    const text = document.createElement("p");
+    text.textContent = `Are you sure you want to delete ${type} "${title}"? ${(type === "board") ? "Any and all stages and tasks will be deleted." : (type === "stage") ? "Any and all tasks will be deleted" : ""}`
+    const cancelBtn = document.createElement("button");
+    cancelBtn.type = "button";
+    cancelBtn.id = "closeBtn";
+    cancelBtn.textContent = "Cancel"
+
+    const confirmBtn = document.createElement("button");
+    confirmBtn.type = "button";
+    confirmBtn.id = "confirmBtn";
+    confirmBtn.textContent = "Confirm"
+
+    dialog.appendChild(text);
+    dialog.appendChild(cancelBtn);
+    dialog.appendChild(confirmBtn);
+
+    return dialog;
 }
 
 function renderFormTemplate(renderFormContent) {
@@ -211,11 +281,11 @@ function renderTaskForm(task = null) {
     container.appendChild(titleInput);
 
     const taskDescriptionLabel = document.createElement("label");
-    taskDescriptionLabel.htmlFor = "description";
+    taskDescriptionLabel.htmlFor = "task_description";
     taskDescriptionLabel.textContent = "Description:";
     const taskDescriptionInput = document.createElement("textarea");
-    taskDescriptionInput.name = "description";
-    taskDescriptionInput.id = "description";
+    taskDescriptionInput.name = "task_description";
+    taskDescriptionInput.id = "task_description";
     taskDescriptionInput.maxLength = 1000;
     taskDescriptionInput.textContent = task?.description ?? "";
 
@@ -234,17 +304,19 @@ function renderTaskForm(task = null) {
     container.appendChild(deadlineLabel);
     container.appendChild(deadlineInput);
 
-    const completionLabel = document.createElement("label");
-    completionLabel.htmlFor = "complete";
-    completionLabel.textContent = "Complete?";
-    const completionInput = document.createElement("input");
-    completionInput.name = "complete";
-    completionInput.id = "complete";
-    completionInput.type = "checkbox";
-    completionInput.checked = task?.is_complete ?? false;
+    if (task) {
+        const completionLabel = document.createElement("label");
+        completionLabel.htmlFor = "-s_complete";
+        completionLabel.textContent = "Complete?";
+        const completionInput = document.createElement("input");
+        completionInput.name = "is_complete";
+        completionInput.id = "is_complete";
+        completionInput.type = "checkbox";
+        completionInput.checked = task?.is_complete ?? false;
 
-    container.appendChild(completionLabel);
-    container.appendChild(completionInput);
+        container.appendChild(completionLabel);
+        container.appendChild(completionInput);
+    }
 
     // add parent task option in m6
     // add tags in m5
@@ -261,5 +333,6 @@ export {
     renderFormTemplate,
     renderBoardForm,
     renderStageForm,
-    renderTaskForm
+    renderTaskForm,
+    renderDeleteAlert
 }

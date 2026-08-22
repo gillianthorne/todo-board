@@ -14,6 +14,6 @@ class Stage(Base):
     stage_position: Mapped[int] = mapped_column(nullable=False)
     colour: Mapped[Optional[str]] = mapped_column(String(6), nullable=True)
 
-    board: Mapped["Board"] = relationship(back_populates="stages")
+    board: Mapped["Board"] = relationship(back_populates="stages", cascade="all, delete-orphan")
     tasks: Mapped[list["Task"]] = relationship(back_populates="stage")
 

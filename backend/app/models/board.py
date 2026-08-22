@@ -12,5 +12,5 @@ class Board(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, server_default=func.now())
     colour: Mapped[Optional[str]] = mapped_column(String(6), nullable=True)
 
-    stages: Mapped[list["Stage"]] = relationship(back_populates="board")
+    stages: Mapped[list["Stage"]] = relationship(back_populates="board", cascade="all, delete-orphan")
     recurring_templates: Mapped[list["RecurringTemplate"]] = relationship(back_populates="board")

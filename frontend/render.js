@@ -86,7 +86,6 @@ function renderHeader(board) {
 }
 
 function renderTask(task) {
-    console.log(task)
     const taskContainer = document.createElement("div");
     taskContainer.id = `task-${task.id}`;
     taskContainer.classList.add("task");
@@ -137,8 +136,21 @@ function renderTask(task) {
 
     buttons.appendChild(editBtn);
     buttons.appendChild(deleteBtn);
-    
     taskContainer.appendChild(buttons);
+
+    const finishedLabel = document.createElement("label");
+    finishedLabel.htmlFor = `finished-task-${task.id}`;
+    finishedLabel.textContent = "Finished?";
+    const finishedCheck = document.createElement("input");
+    finishedCheck.type = "checkbox";
+    finishedCheck.id = `finished-task-${task.id}`;
+    finishedCheck.name = `finished-task-${task.id}`;
+    finishedCheck.checked = task.is_complete ?? false;
+    finishedCheck.classList.add("finishTask");
+    finishedCheck.dataset.taskId = task.id;
+    
+    taskContainer.appendChild(finishedLabel);
+    taskContainer.appendChild(finishedCheck);
 
     return taskContainer
 }
@@ -171,7 +183,6 @@ function renderFormTemplate(renderFormContent) {
     form.method = "dialog";
     
     const content = renderFormContent();
-    console.log(content);
     form.appendChild(content)
 
     const formActions = document.createElement("div");
@@ -196,8 +207,6 @@ function renderFormTemplate(renderFormContent) {
 }
 
 function renderBoardForm(board = null) {
-    console.log(board);
-
     const container = document.createElement("div")
 
     const titleLabel = document.createElement("label");
@@ -211,7 +220,6 @@ function renderBoardForm(board = null) {
     // "board?" means "don't throw me an error if there isn't a board while checking to see if there's a title on the board"
     // so basically: if no board return "", if yes board return title unless there isn't one then ""
     titleInput.value = board?.board_name ?? "";
-    console.log(board?.title);
     
     container.appendChild(titleLabel);
     container.appendChild(titleInput);

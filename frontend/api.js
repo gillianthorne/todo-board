@@ -140,6 +140,33 @@ async function moveTasks(boardId, stageId, taskId, body) {
     return data;
 }
 
+// --- TAG FUNCTIONS ---
+// create
+async function createTag(body) {
+    const data = await apiFetch(`/tags`, "POST", body);
+    return data;
+}
+
+async function getTags(body) {
+    const data = await apiFetch("/tags", "GET", body);
+    return data;
+}
+
+async function getIndividualTag(tagId, body) {
+    const data = await apiFetch(`/tags/${tagId}`, "GET", body);
+    return data;
+}
+
+async function updateTag(tagId, body) {
+    const data = await apiFetch(`/tags/${tagId}`, "PATCH", body);
+    return data;
+}
+
+async function deleteTag(tagId, body) {
+    const data = await apiFetch(`/tags/${tagId}`, "PATCH", body);
+    return data;
+}
+
 export { 
     createBoard, 
     getBoards, 
@@ -157,5 +184,10 @@ export {
     getIndividualTask,
     updateTask,
     deleteTask,
-    reorderTasks
+    reorderTasks,
+    createTag,
+    getTags,
+    getIndividualTag,
+    updateTag,
+    deleteTag
 }

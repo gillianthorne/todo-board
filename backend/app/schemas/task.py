@@ -3,6 +3,8 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+from app.schemas.tag import TagRead
+
 
 class TaskCreate(BaseModel):
     title: str
@@ -11,6 +13,7 @@ class TaskCreate(BaseModel):
     colour: Optional[str] = None
     parent_task_id: Optional[int] = None
     recurring_template_id: Optional[int] = None
+    tag_ids: list[int] = []
 
 class TaskUpdate(BaseModel):
     title: Optional[str] = None
@@ -20,6 +23,7 @@ class TaskUpdate(BaseModel):
     parent_task_id: Optional[int] = None
     recurring_template_id: Optional[int] = None
     is_complete: Optional[bool] = None
+    tag_ids: list[int] = []
 
 class TaskRead(BaseModel):
     id: int
@@ -33,6 +37,7 @@ class TaskRead(BaseModel):
     created_at: datetime
     completed_at: Optional[datetime] = None
     is_complete: bool
+    tags: list[TagRead] = []
 
 class TaskReorder(BaseModel):
     task_ids: list[int]

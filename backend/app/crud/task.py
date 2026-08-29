@@ -1,13 +1,15 @@
 from datetime import datetime
 
+from fastapi import HTTPException
 from sqlalchemy import select
 
 from app.schemas.task import TaskCreate, TaskUpdate
 from sqlalchemy.orm import Session
 
 from app.models.task import Task
+from app.models.tag import Tag
 
-def create_task(db: Session, task_in: TaskCreate, stage_id: int) -> Task:
+def create_task(db: Session, task_in: TaskCreate, stage_id: int, tags: list[Tag]) -> Task:
     tasks = db.execute(select(Task).where(Task.stage_id == stage_id)).scalars().all()
     if not tasks:
         position = 0
@@ -21,7 +23,8 @@ def create_task(db: Session, task_in: TaskCreate, stage_id: int) -> Task:
         parent_task_id = task_in.parent_task_id,
         recurring_template_id = task_in.recurring_template_id,
         task_position = position,
-        stage_id = stage_id
+        stage_id = stage_id,
+        tags = tags
     )
 
     db.add(new_task)
@@ -37,8 +40,13 @@ def get_task(db: Session, task_id: int) -> Task | None:
     task = db.get(Task, task_id)
     return task
 
-def update_task(db: Session, task: Task, task_in: TaskUpdate) -> Task:
+def update_task(db: Session, task: Task, task_in: TaskUpdate, tags: list[Tag] | None) -> Task:
     updated_fields = task_in.model_dump(exclude_unset=True)
+
+    tag_ids = updated_fields.pop("tag_ids", None)
+
+    if tags is not None:
+        task.tags = tags
 
     for key, value in updated_fields.items():
         setattr(task, key, value)

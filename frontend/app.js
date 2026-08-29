@@ -1,10 +1,11 @@
 import { renderStage, renderBoardTabs, renderHeader, renderBoardForm, renderFormTemplate, renderStageForm, renderDeleteAlert, renderTaskForm } from "./render.js";
-import { getStages, getBoards, getIndividualBoard, getTasks, createBoard, updateBoard, updateStage, createStage, deleteBoard, deleteStage, createTask, getIndividualTask, updateTask, deleteTask } from "./api.js";
+import { getStages, getBoards, getIndividualBoard, getTasks, createBoard, updateBoard, updateStage, createStage, deleteBoard, deleteStage, createTask, getIndividualTask, updateTask, deleteTask, getTags } from "./api.js";
 
 let currentBoardId = null;
 const stagesContainer = document.querySelector('#stages-container');
 const boardSelect = document.querySelector('#board-select');
 const bodyTag = document.querySelector('body');
+let allTags = null;
 
 
 // https://stackoverflow.com/a/6211716
@@ -52,11 +53,13 @@ async function loadBoard(boardId) {
             await initializeBoards(newBoard.id);
             // NOW we can close it
             renderDialog.close();
+            bodyTag.removeChild(renderDialog);
         })
 
         // there's also a close button so on click close and don't do anything else
         renderForm.querySelector("#closeBtn").addEventListener("click", (e) => {
             renderDialog.close();
+            bodyTag.removeChild(renderDialog);
         })
     });
 
@@ -80,11 +83,13 @@ async function loadBoard(boardId) {
             // again, we go to the new board
             await initializeBoards(updatedBoard.id);
             renderDialog.close();
+            bodyTag.removeChild(renderDialog);
         })
 
         // on close, close. do nothing else.
         renderForm.querySelector("#closeBtn").addEventListener("click", (e) => {
             renderDialog.close();
+            bodyTag.removeChild(renderDialog);
         })
     });
 
@@ -97,12 +102,14 @@ async function loadBoard(boardId) {
 
         renderDialog.querySelector("#closeBtn").addEventListener("click", (e) => {
             renderDialog.close();
+            bodyTag.removeChild(renderDialog);
         });
 
         renderDialog.querySelector("#confirmBtn").addEventListener("click", async (e) => {
             await deleteBoard(boardId);
             await initializeBoards();
             renderDialog.close();
+            bodyTag.removeChild(renderDialog);
         })
     })
 
@@ -124,10 +131,12 @@ async function loadBoard(boardId) {
             // we're now calling loadStages because loadStages is individual board level logic
             loadStages(boardId);
             renderDialog.close();
+            bodyTag.removeChild(renderDialog);
         });
 
         renderForm.querySelector("#closeBtn").addEventListener("click", (e) => {
             renderDialog.close();
+            bodyTag.removeChild(renderDialog);
         })
     })
 
@@ -172,10 +181,12 @@ async function loadIndividualStage(stage) {
             });
             await loadStages(boardId);
             renderDialog.close();
+            bodyTag.removeChild(renderDialog);
         })
 
         renderForm.querySelector("#closeBtn").addEventListener("click", (e) => {
             renderDialog.close();
+            bodyTag.removeChild(renderDialog);
         })
     })
 
@@ -188,19 +199,21 @@ async function loadIndividualStage(stage) {
 
         renderDialog.querySelector("#closeBtn").addEventListener("click", (e) => {
             renderDialog.close();
+            bodyTag.removeChild(renderDialog);
         });
 
         renderDialog.querySelector("#confirmBtn").addEventListener("click", async (e) => {
             await deleteStage(boardId, stage.id);
             await loadStages(boardId);
             renderDialog.close();
+            bodyTag.removeChild(renderDialog);
         })
     })
 
     // yet another button
     const addTaskBtn = stageRender.querySelector(".addTaskBtn");
     addTaskBtn.addEventListener("click", (event) => {
-        const renderDialog = renderFormTemplate(renderTaskForm);
+        const renderDialog = renderFormTemplate(function () { return renderTaskForm(null, allTags) });
         bodyTag.appendChild(renderDialog);
         renderDialog.showModal();
 
@@ -212,15 +225,18 @@ async function loadIndividualStage(stage) {
                 "title": data.get("title"),
                 // this is slightly different - we're allowing things to be null
                 "task_description": data.get("task_description") || null,
-                "deadline": data.get("deadline") || null
+                "deadline": data.get("deadline") || null,
+                "tag_ids": data.getAll("tag_ids")
                 // add parent_task_id and recurring_template_id later
             });
             await loadStages(boardId);
             renderDialog.close();
+            bodyTag.removeChild(renderDialog);
         })
 
         renderForm.querySelector("#closeBtn").addEventListener("click", (e) => {
             renderDialog.close();
+            bodyTag.removeChild(renderDialog);
         })
     })
     stagesContainer.append(stageRender);
@@ -232,7 +248,7 @@ async function loadIndividualStage(stage) {
     editTaskBtns.forEach(btn => {
         btn.addEventListener("click", async (e) => {
             const task = await getIndividualTask(boardId, stage.id, parseInt(e.target.dataset.taskId, 10));
-            const renderDialog = renderFormTemplate( function() { return renderTaskForm(task) } );
+            const renderDialog = renderFormTemplate( function() { return renderTaskForm(task, allTags) } );
             bodyTag.appendChild(renderDialog);
             renderDialog.showModal();
 
@@ -245,16 +261,19 @@ async function loadIndividualStage(stage) {
                     "task_description": data.get("task_description") || null,
                     "deadline": data.get("deadline") || null,
                     // instead of defauling to null, we default to false if the checkbox is unchecked (which makes sense, because that's the completion checkbox)
-                    "is_complete": data.get("is_complete") || false
+                    "is_complete": data.get("is_complete") || false,
+                    "tag_ids": data.getAll("tag_ids")
                 })
 
                 await loadStages(boardId);
 
                 renderDialog.close();
+                bodyTag.removeChild(renderDialog);
             })
 
             renderForm.querySelector("#closeBtn").addEventListener("click", (e) => {
                 renderDialog.close();
+                bodyTag.removeChild(renderDialog);
             })
         })
     });
@@ -270,12 +289,14 @@ async function loadIndividualStage(stage) {
 
             renderDialog.querySelector("#closeBtn").addEventListener("click", (e) => {
                 renderDialog.close();
+                bodyTag.removeChild(renderDialog);
             });
 
             renderDialog.querySelector("#confirmBtn").addEventListener("click", async (e) => {
                 await deleteTask(boardId, stage.id, task.id);
                 await loadStages(boardId);
                 renderDialog.close();
+            bodyTag.removeChild(renderDialog);
             })
         })
     });
@@ -330,6 +351,8 @@ async function init() {
     console.log("running...")
 
     initializeBoards();
+
+    allTags = await getTags();
 }
 
 init();

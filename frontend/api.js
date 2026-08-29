@@ -147,13 +147,13 @@ async function createTag(body) {
     return data;
 }
 
-async function getTags(body) {
-    const data = await apiFetch("/tags", "GET", body);
+async function getTags() {
+    const data = await apiFetch("/tags", "GET");
     return data;
 }
 
 async function getIndividualTag(tagId, body) {
-    const data = await apiFetch(`/tags/${tagId}`, "GET", body);
+    const data = await apiFetch(`/tags/${tagId}`, "GET");
     return data;
 }
 
@@ -163,7 +163,7 @@ async function updateTag(tagId, body) {
 }
 
 async function deleteTag(tagId, body) {
-    const data = await apiFetch(`/tags/${tagId}`, "PATCH", body);
+    const data = await apiFetch(`/tags/${tagId}`, "DELETE");
     return data;
 }
 

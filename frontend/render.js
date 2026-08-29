@@ -98,6 +98,7 @@ function renderTask(task) {
 
     // this is for m4
     const tagContainer = document.createElement("div");
+    task.tags.forEach((tag) => tagContainer.append(renderTag(tag)));
     tagContainer.classList.add("tags");
     taskContainer.appendChild(tagContainer);
 
@@ -153,6 +154,18 @@ function renderTask(task) {
     taskContainer.appendChild(finishedCheck);
 
     return taskContainer
+}
+
+function renderTag(tag) {
+    const tagElement = document.createElement("span");
+    const tagLink = document.createElement("a");
+    tagLink.href = "#";
+    tagLink.textContent = tag.tag_name;
+    tagElement.appendChild(tagLink);
+    tagElement.style.backgroundColor = `#${tag.colour ?? "AAA"}`
+    tagElement.style.color = `contrast-color(#${tag.colour})`
+    tagLink.style.color = "inherit"
+    return tagElement;
 }
 
 function renderDeleteAlert(type, title) {
@@ -305,7 +318,7 @@ function renderStageForm(stage = null) {
     return container
 }
 
-function renderTaskForm(task = null) {
+function renderTaskForm(task = null, allTags) {
     const container = document.createElement("div");
 
     // i'll figure out how to add a stage select later - maybe i have to have a "select board" and then "select stage"?? 
@@ -337,6 +350,37 @@ function renderTaskForm(task = null) {
     titleInputRow.appendChild(titleLabel);
     titleInputRow.appendChild(titleInput);
     container.appendChild(titleInputRow)
+
+
+    const tagPickerFieldset = document.createElement("fieldset");
+    tagPickerFieldset.classList.add("tagPicker");
+
+    allTags.forEach((tag) => {
+        const tagOptionDiv = document.createElement("div");
+        tagOptionDiv.classList.add("tagOption");
+
+        const tagInput = document.createElement("input");
+        tagInput.id = `tag-${tag.id}`;
+        tagInput.name = "tag_ids";
+        tagInput.value = `${tag.id}`;
+        tagInput.type = "checkbox"
+        
+        if (task?.tags?.some((t) => t.id === tag.id)) {
+            tagInput.checked = true
+        }
+
+        tagOptionDiv.appendChild(tagInput);
+
+        const tagLabel = document.createElement("label");
+        tagLabel.htmlFor = `tag-${tag.id}`;
+        tagLabel.textContent = tag.tag_name;
+        tagOptionDiv.appendChild(tagLabel);
+        tagOptionDiv.style.setProperty("--tag-colour", `#${tag.colour}` ?? "#FFF");
+
+        tagPickerFieldset.appendChild(tagOptionDiv)
+    })
+
+    container.appendChild(tagPickerFieldset)
 
     const descriptionInputRow = document.createElement("div");
     descriptionInputRow.classList.add("inputRow");

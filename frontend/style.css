@@ -1,3 +1,7 @@
+:root {
+    font-size: 14px;
+}
+
 body {
     margin: 0
 }
@@ -53,14 +57,13 @@ main {
     display: inline;
 }
 
-.task .tags {
+.tags {
     display: flex;
 }
 
-.task .tags span {
+.tags span {
     margin: 4px 2px;
     padding: 4px;
-    color: black;
     text-decoration: none;
     border-radius: 4px;
 }
@@ -69,8 +72,9 @@ main {
     margin: 8px 0;
 }
 
-.finished h2 {
+.finished h2, .finished p {
     text-decoration: line-through;
+    font-size: 14px;
 }
 
 .subtask {
@@ -138,4 +142,34 @@ form {
 .formActions button {
     margin: 5px;
     font-size: 16px;
+}
+
+.tagOption {
+    display: inline-block;
+}
+
+.tagOption input {
+    width: 0px;
+    height: 1px;
+    opacity: 0;
+    overflow: hidden;
+    margin: 0;
+}
+
+.tagOption label {
+    background-color: #FFF;
+    border: 2px solid var(--tag-colour);
+    padding: 4px;
+    margin: 4px 2px;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.tagOption input:checked + label {
+    background-color: var(--tag-colour);
+    color: contrast-color(var(--tag-colour));
+}
+
+.tagPicker {
+    padding: 8px;
 }

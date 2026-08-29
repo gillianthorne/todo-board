@@ -94,3 +94,48 @@ main {
     padding: 12px 18px;
     border-radius: 8px 8px 0 0;
 }
+
+dialog {
+    width: 40vw;
+    height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+dialog::backdrop {
+    background-color: #00000040;
+    backdrop-filter: blur(3px);
+}
+
+form {
+    width: 80%;
+    margin: 0 auto;
+}
+
+.inputRow {
+    width: 100%;
+    display: flex;
+    padding: 10px;
+    align-content: center;
+}
+
+.inputRow label {
+    display: inline-block;
+    width: 120px;
+    margin: auto 10px;
+    text-align: right;
+}
+
+.inputRow input, .inputRow textarea {
+    width: calc(100% - 130px);
+}
+
+.formActions {
+    text-align: center;
+}
+
+.formActions button {
+    margin: 5px;
+    font-size: 16px;
+}

@@ -186,7 +186,7 @@ function renderFormTemplate(renderFormContent) {
     form.appendChild(content)
 
     const formActions = document.createElement("div");
-    formActions.classList.add("form-actions")
+    formActions.classList.add("formActions")
     
     const cancelBtn = document.createElement("button");
     cancelBtn.type = "button";
@@ -207,8 +207,21 @@ function renderFormTemplate(renderFormContent) {
 }
 
 function renderBoardForm(board = null) {
-    const container = document.createElement("div")
+    const container = document.createElement("div");
 
+    const header = document.createElement("h1");
+    const boardTitle = board?.board_name ?? "";
+    
+    if (boardTitle) {
+        header.textContent = `Edit Board "${boardTitle}"`
+    } else {
+        header.textContent = "Create Board";
+    }
+
+    container.appendChild(header);
+
+    const titleInputRow = document.createElement("div");
+    titleInputRow.classList.add("inputRow");
     const titleLabel = document.createElement("label");
     titleLabel.htmlFor = "title";
     titleLabel.textContent = "Title: "
@@ -219,11 +232,14 @@ function renderBoardForm(board = null) {
     titleInput.required = true;
     // "board?" means "don't throw me an error if there isn't a board while checking to see if there's a title on the board"
     // so basically: if no board return "", if yes board return title unless there isn't one then ""
-    titleInput.value = board?.board_name ?? "";
+    titleInput.value = boardTitle;
     
-    container.appendChild(titleLabel);
-    container.appendChild(titleInput);
+    titleInputRow.appendChild(titleLabel);
+    titleInputRow.appendChild(titleInput);
+    container.appendChild(titleInputRow);
 
+    const colourInputRow = document.createElement("div");
+    colourInputRow.classList.add("inputRow");
     const colourPickerLabel = document.createElement("label");
     colourPickerLabel.htmlFor = "colour";
     colourPickerLabel.textContent = "Board colour: ";
@@ -233,8 +249,9 @@ function renderBoardForm(board = null) {
     colourPickerInput.type = "color";
     colourPickerInput.value = `#${board?.colour ?? "FFFFFF"}`
 
-    container.appendChild(colourPickerLabel);
-    container.appendChild(colourPickerInput);
+    colourInputRow.appendChild(colourPickerLabel);
+    colourInputRow.appendChild(colourPickerInput);
+    container.append(colourInputRow);
 
     return container
 }
@@ -242,6 +259,20 @@ function renderBoardForm(board = null) {
 function renderStageForm(stage = null) {
     const container = document.createElement("div");
 
+    const header = document.createElement("h1");
+    const stageTitle = stage?.stage_name ?? "";
+    
+    if (stageTitle) {
+        header.textContent = `Edit Stage "${stageTitle}"`
+    } else {
+        header.textContent = "Create Stage";
+    }
+
+    container.appendChild(header);
+
+
+    const nameInputRow = document.createElement("div");
+    nameInputRow.classList.add("inputRow");
     const nameLabel = document.createElement("label");
     nameLabel.htmlFor = "stage_name";
     nameLabel.textContent = "Name: ";
@@ -250,11 +281,14 @@ function renderStageForm(stage = null) {
     nameInput.name = "stage_name"
     nameInput.id = "stage_name";
     nameInput.required = true;
-    nameInput.value = stage?.stage_name ?? "";
+    nameInput.value = stageTitle;
 
-    container.appendChild(nameLabel);
-    container.appendChild(nameInput);
+    nameInputRow.appendChild(nameLabel);
+    nameInputRow.appendChild(nameInput);
+    container.appendChild(nameInputRow);
 
+    const colourInputRow = document.createElement("div");
+    colourInputRow.classList.add("inputRow");
     const colourPickerLabel = document.createElement("label");
     colourPickerLabel.htmlFor = "colour";
     colourPickerLabel.textContent = "Section colour: ";
@@ -264,8 +298,9 @@ function renderStageForm(stage = null) {
     colourPickerInput.type = "color";
     colourPickerInput.value = `#${stage?.colour ?? "FFFFFF"}`
     
-    container.appendChild(colourPickerLabel);
-    container.appendChild(colourPickerInput);
+    colourInputRow.appendChild(colourPickerLabel);
+    colourInputRow.appendChild(colourPickerInput);
+    container.appendChild(colourInputRow);
 
     return container
 }
@@ -275,6 +310,20 @@ function renderTaskForm(task = null) {
 
     // i'll figure out how to add a stage select later - maybe i have to have a "select board" and then "select stage"?? 
 
+
+    const header = document.createElement("h1");
+    const taskTitle = task?.title ?? "";
+    
+    if (taskTitle) {
+        header.textContent = `Edit Task "${taskTitle}"`
+    } else {
+        header.textContent = "Create Task";
+    }
+
+    container.appendChild(header);
+
+    const titleInputRow = document.createElement("div");
+    titleInputRow.classList.add("inputRow");
     const titleLabel = document.createElement("label");
     titleLabel.htmlFor = "title";
     titleLabel.textContent = "Title: ";
@@ -285,9 +334,12 @@ function renderTaskForm(task = null) {
     titleInput.required = true;
     titleInput.value = task?.title ?? "";
 
-    container.appendChild(titleLabel);
-    container.appendChild(titleInput);
+    titleInputRow.appendChild(titleLabel);
+    titleInputRow.appendChild(titleInput);
+    container.appendChild(titleInputRow)
 
+    const descriptionInputRow = document.createElement("div");
+    descriptionInputRow.classList.add("inputRow");
     const taskDescriptionLabel = document.createElement("label");
     taskDescriptionLabel.htmlFor = "task_description";
     taskDescriptionLabel.textContent = "Description:";
@@ -295,11 +347,14 @@ function renderTaskForm(task = null) {
     taskDescriptionInput.name = "task_description";
     taskDescriptionInput.id = "task_description";
     taskDescriptionInput.maxLength = 1000;
-    taskDescriptionInput.textContent = task?.description ?? "";
+    taskDescriptionInput.textContent = task?.task_description ?? "";
 
-    container.appendChild(taskDescriptionLabel);
-    container.appendChild(taskDescriptionInput);
+    descriptionInputRow.appendChild(taskDescriptionLabel);
+    descriptionInputRow.appendChild(taskDescriptionInput);
+    container.appendChild(descriptionInputRow)
 
+    const deadlineInputRow = document.createElement("div");
+    deadlineInputRow.classList.add("inputRow");
     const deadlineLabel = document.createElement("label");
     deadlineLabel.htmlFor = "deadline";
     deadlineLabel.textContent = "Deadline:";
@@ -309,10 +364,13 @@ function renderTaskForm(task = null) {
     deadlineInput.type = "date";
     deadlineInput.value = task?.deadline ?? "";
 
-    container.appendChild(deadlineLabel);
-    container.appendChild(deadlineInput);
+    deadlineInputRow.appendChild(deadlineLabel);
+    deadlineInputRow.appendChild(deadlineInput);
+    container.appendChild(deadlineInputRow);
 
     if (task) {
+        const completionInputRow = document.createElement("div");
+        completionInputRow.classList.add("inputRow");
         const completionLabel = document.createElement("label");
         completionLabel.htmlFor = "-s_complete";
         completionLabel.textContent = "Complete?";
@@ -322,8 +380,9 @@ function renderTaskForm(task = null) {
         completionInput.type = "checkbox";
         completionInput.checked = task?.is_complete ?? false;
 
-        container.appendChild(completionLabel);
-        container.appendChild(completionInput);
+        completionInputRow.appendChild(completionLabel);
+        completionInputRow.appendChild(completionInput);
+        container.appendChild(completionInputRow);
     }
 
     // add parent task option in m6

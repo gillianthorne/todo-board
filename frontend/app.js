@@ -228,7 +228,7 @@ async function loadIndividualStage(stage) {
 
 
     // more buttons
-    const editTaskBtns = document.querySelectorAll(".editTask");
+    const editTaskBtns = document.querySelectorAll(`#stage-${stage.id} .editTask`);
     editTaskBtns.forEach(btn => {
         btn.addEventListener("click", async (e) => {
             const task = await getIndividualTask(boardId, stage.id, parseInt(e.target.dataset.taskId, 10));
@@ -260,7 +260,7 @@ async function loadIndividualStage(stage) {
     });
 
     // even more buttons
-    const deleteTaskBtns = document.querySelectorAll(".deleteTask");
+    const deleteTaskBtns = document.querySelectorAll(`#stage-${stage.id} .deleteTask`);
     deleteTaskBtns.forEach(btn => {
         btn.addEventListener("click", async (e) => {
             const task = await getIndividualTask(boardId, stage.id, parseInt(e.target.dataset.taskId, 10));

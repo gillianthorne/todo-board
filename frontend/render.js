@@ -22,7 +22,7 @@ function renderStage(stageData, tasks) {
     const stageName = document.createElement("h2");
     stageName.textContent = stageData.stage_name;
     const taskCount = document.createElement("p");
-    taskCount.textContent = "Task count goes here";
+    taskCount.textContent = `Tasks: ${tasks.length}`;
     stageDetails.appendChild(stageName);
     stageDetails.appendChild(taskCount);
     stage.append(stageDetails);
@@ -104,10 +104,16 @@ function renderTask(task) {
     taskContainer.appendChild(tagContainer);
 
     // this is for m8
-    if (task.deadline) {
+    // i want !(is_complete) because why do i care when a task is due if it's finished
+    if (task.deadline && !(task.is_complete)) {
         const deadline = document.createElement("p");
         // i'll need a helper function that parses this nicely, plus something to calculate days, but that's a future milestone
-        deadline.textContent = task.deadline;
+        const deadlineDate = new Date(task.deadline.slice(0, 10));
+        const today = Date.now();
+        const timeDifference = deadlineDate - today;
+        const daysDiff = Math.ceil(timeDifference / (1000 * 3600 * 24));
+        deadline.textContent = `Due ${task.deadline.slice(0, 10)} - ${daysDiff} ${daysDiff === 1 ? "day" : "days"} remaining.`;
+        
         taskContainer.append(deadline);
     }
 
@@ -319,13 +325,14 @@ function renderStageForm(stage = null) {
 }
 
 function renderTaskForm(task = null, allTags) {
+    console.log("renderTaskForm");
     const container = document.createElement("div");
 
     // i'll figure out how to add a stage select later - maybe i have to have a "select board" and then "select stage"?? 
 
 
     const header = document.createElement("h1");
-    const taskTitle = task?.title ?? "";
+    const taskTitle = task?.title ?? null;
     
     if (taskTitle) {
         header.textContent = `Edit Task "${taskTitle}"`
@@ -351,36 +358,23 @@ function renderTaskForm(task = null, allTags) {
     titleInputRow.appendChild(titleInput);
     container.appendChild(titleInputRow)
 
-
     const tagPickerFieldset = document.createElement("fieldset");
     tagPickerFieldset.classList.add("tagPicker");
 
-    allTags.forEach((tag) => {
-        const tagOptionDiv = document.createElement("div");
-        tagOptionDiv.classList.add("tagOption");
+    const legend = document.createElement("legend");
+    legend.textContent = "Tags: ";
+    tagPickerFieldset.appendChild(legend);
 
-        const tagInput = document.createElement("input");
-        tagInput.id = `tag-${tag.id}`;
-        tagInput.name = "tag_ids";
-        tagInput.value = `${tag.id}`;
-        tagInput.type = "checkbox"
-        
-        if (task?.tags?.some((t) => t.id === tag.id)) {
-            tagInput.checked = true
-        }
+    tagPickerFieldset.appendChild(renderTagsOnForm(allTags, task?.tags?.map(t => t.id) ?? []))
 
-        tagOptionDiv.appendChild(tagInput);
+    container.appendChild(tagPickerFieldset);
 
-        const tagLabel = document.createElement("label");
-        tagLabel.htmlFor = `tag-${tag.id}`;
-        tagLabel.textContent = tag.tag_name;
-        tagOptionDiv.appendChild(tagLabel);
-        tagOptionDiv.style.setProperty("--tag-colour", `#${tag.colour}` ?? "#FFF");
+    const addTagBtn = document.createElement("button");
+    addTagBtn.type = "button";
+    addTagBtn.textContent = "+";
+    addTagBtn.id = "addTagBtn";
 
-        tagPickerFieldset.appendChild(tagOptionDiv)
-    })
-
-    container.appendChild(tagPickerFieldset)
+    container.appendChild(addTagBtn);
 
     const descriptionInputRow = document.createElement("div");
     descriptionInputRow.classList.add("inputRow");
@@ -436,6 +430,76 @@ function renderTaskForm(task = null, allTags) {
     return container;
 }
 
+function renderTagForm() {
+    const container = document.createElement("div");
+
+    const tagNameInputRow = document.createElement("div");
+    tagNameInputRow.classList.add("inputRow");
+    const tagNameLabel = document.createElement("label");
+    tagNameLabel.htmlFor = "tag_name";
+    tagNameLabel.textContent = "Tag Name: "
+    const tagNameInput = document.createElement("input");
+    tagNameInput.type = "text";
+    tagNameInput.id = "tag_name";
+    tagNameInput.name = "tag_name";
+    tagNameInput.required = true;
+    
+    tagNameInputRow.appendChild(tagNameLabel);
+    tagNameInputRow.appendChild(tagNameInput);
+    container.appendChild(tagNameInputRow);
+
+    const colourInputRow = document.createElement("div");
+    colourInputRow.classList.add("inputRow");
+    const colourPickerLabel = document.createElement("label");
+    colourPickerLabel.htmlFor = "colour";
+    colourPickerLabel.textContent = "Tag colour: ";
+    const colourPickerInput = document.createElement("input");
+    colourPickerInput.name = "colour";
+    colourPickerInput.id = "colour"
+    colourPickerInput.type = "color";
+
+    colourInputRow.appendChild(colourPickerLabel);
+    colourInputRow.appendChild(colourPickerInput);
+    container.append(colourInputRow);
+
+    return container
+}
+
+function renderTagsOnForm(allTags, selectedTags) {
+
+    const tagSelection = document.createElement("div");
+    tagSelection.classList.add("tagSelection");
+
+    allTags.forEach((tag) => {
+        const tagOptionDiv = document.createElement("div");
+        tagOptionDiv.classList.add("tagOption");
+
+        const tagInput = document.createElement("input");
+        tagInput.id = `tag-${tag.id}`;
+        tagInput.name = "tag_ids";
+        tagInput.value = `${tag.id}`;
+        tagInput.type = "checkbox"
+        
+        // .some checks if any elements "pass the test" - so task.tags.some(1) would pass if task.tags contains a tag with the id of 1
+        // notably works because task.tags is a list of type int (though neither javascript nor python really enforce that...) 
+        if (selectedTags.includes(tag.id)) {
+            tagInput.checked = true
+        }
+
+        tagOptionDiv.appendChild(tagInput);
+
+        const tagLabel = document.createElement("label");
+        tagLabel.htmlFor = `tag-${tag.id}`;
+        tagLabel.textContent = tag.tag_name;
+        tagOptionDiv.appendChild(tagLabel);
+        tagOptionDiv.style.setProperty("--tag-colour", `#${tag.colour ?? "#FFF"}`);
+
+        tagSelection.appendChild(tagOptionDiv);
+
+    })
+    return tagSelection
+}
+
 export { 
     renderBoardTabs,
     renderStage,
@@ -445,5 +509,8 @@ export {
     renderBoardForm,
     renderStageForm,
     renderTaskForm,
-    renderDeleteAlert
+    renderDeleteAlert,
+    renderTagForm,
+    renderTag,
+    renderTagsOnForm
 }

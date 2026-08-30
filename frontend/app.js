@@ -1,5 +1,5 @@
-import { renderStage, renderBoardTabs, renderHeader, renderBoardForm, renderFormTemplate, renderStageForm, renderDeleteAlert, renderTaskForm } from "./render.js";
-import { getStages, getBoards, getIndividualBoard, getTasks, createBoard, updateBoard, updateStage, createStage, deleteBoard, deleteStage, createTask, getIndividualTask, updateTask, deleteTask, getTags } from "./api.js";
+import { renderStage, renderBoardTabs, renderHeader, renderBoardForm, renderFormTemplate, renderStageForm, renderDeleteAlert, renderTaskForm, renderTagForm, renderTagsOnForm } from "./render.js";
+import { getStages, getBoards, getIndividualBoard, getTasks, createBoard, updateBoard, updateStage, createStage, deleteBoard, deleteStage, createTask, getIndividualTask, updateTask, deleteTask, getTags, createTag } from "./api.js";
 
 let currentBoardId = null;
 const stagesContainer = document.querySelector('#stages-container');
@@ -129,7 +129,8 @@ async function loadBoard(boardId) {
                 "colour": data.get("colour").slice(1) 
             });
             // we're now calling loadStages because loadStages is individual board level logic
-            loadStages(boardId);
+            const stages = await getStages(boardId)
+            loadStages(stages);
             renderDialog.close();
             bodyTag.removeChild(renderDialog);
         });
@@ -140,20 +141,19 @@ async function loadBoard(boardId) {
         })
     })
 
-    loadStages(boardId);
+    const stages = await getStages(boardId)
+    loadStages(stages);
 
 }
 
-async function loadStages(boardId) {
-    // we're getting the stages for this board
-    const stages = await getStages(boardId);
+async function loadStages(stages) {
     // we're replacing all other stages with the current ones
     stagesContainer.replaceChildren();
 
-    // can't use forEach with await because if i "async forEach..." it renders them out of order
     // cycle through each stage
+    console.log(stages);
     for (const stage of stages) {
-        loadIndividualStage(stage)
+        await loadIndividualStage(stage)
     }
 }
 
@@ -179,7 +179,8 @@ async function loadIndividualStage(stage) {
                 "stage_name": data.get("stage_name"), 
                 "colour": data.get("colour").slice(1)
             });
-            await loadStages(boardId);
+            const stages = await getStages(boardId)
+            loadStages(stages);
             renderDialog.close();
             bodyTag.removeChild(renderDialog);
         })
@@ -203,8 +204,9 @@ async function loadIndividualStage(stage) {
         });
 
         renderDialog.querySelector("#confirmBtn").addEventListener("click", async (e) => {
-            await deleteStage(boardId, stage.id);
-            await loadStages(boardId);
+            await deleteStage(boardId, stage.id);    
+            const stages = await getStages(boardId)
+            loadStages(stages);
             renderDialog.close();
             bodyTag.removeChild(renderDialog);
         })
@@ -229,7 +231,8 @@ async function loadIndividualStage(stage) {
                 "tag_ids": data.getAll("tag_ids")
                 // add parent_task_id and recurring_template_id later
             });
-            await loadStages(boardId);
+            const stages = await getStages(boardId)
+            loadStages(stages);
             renderDialog.close();
             bodyTag.removeChild(renderDialog);
         })
@@ -237,6 +240,38 @@ async function loadIndividualStage(stage) {
         renderForm.querySelector("#closeBtn").addEventListener("click", (e) => {
             renderDialog.close();
             bodyTag.removeChild(renderDialog);
+        })
+
+        renderForm.querySelector("#addTagBtn").addEventListener("click", (e) => {
+            const savedTags = renderForm.querySelectorAll(".tagOption input:checked")
+
+            const tagInts = Array.from(savedTags).map(t => Number(t.value));
+
+            const renderDialog2 = renderFormTemplate(renderTagForm);
+            bodyTag.appendChild(renderDialog2);
+            renderDialog2.showModal();
+
+            const renderForm = renderDialog2.querySelector("form");
+            renderForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const data = new FormData(renderForm);
+                await createTag({
+                    "tag_name": data.get("tag_name"),
+                    "colour": data.get("colour") || null
+                })
+
+                allTags = await getTags();
+
+                const tagSelection = renderDialog.querySelector(".tagSelection");
+                tagSelection.replaceWith(renderTagsOnForm(allTags, tagInts));
+                
+            })
+
+            renderForm.querySelector("#closeBtn").addEventListener("click", (e) => {
+                renderDialog.close();
+                bodyTag.removeChild(renderDialog2);
+            })
+
         })
     })
     stagesContainer.append(stageRender);
@@ -264,9 +299,8 @@ async function loadIndividualStage(stage) {
                     "is_complete": data.get("is_complete") || false,
                     "tag_ids": data.getAll("tag_ids")
                 })
-
-                await loadStages(boardId);
-
+                const stages = await getStages(boardId)
+                loadStages(stages);
                 renderDialog.close();
                 bodyTag.removeChild(renderDialog);
             })
@@ -274,6 +308,39 @@ async function loadIndividualStage(stage) {
             renderForm.querySelector("#closeBtn").addEventListener("click", (e) => {
                 renderDialog.close();
                 bodyTag.removeChild(renderDialog);
+            })
+
+            renderForm.querySelector("#addTagBtn").addEventListener("click", (e) => {
+                const savedTags = renderForm.querySelectorAll(".tagOption input:checked")
+
+                const tagInts = Array.from(savedTags).map(t => Number(t.value));
+
+                const renderDialog2 = renderFormTemplate(renderTagForm);
+                bodyTag.appendChild(renderDialog2);
+                renderDialog2.showModal();
+
+                const renderForm2 = renderDialog2.querySelector("form");
+                renderForm2.addEventListener("submit", async (e) => {
+                    e.preventDefault();
+                    const data = new FormData(renderForm2);
+                    await createTag({
+                        "tag_name": data.get("tag_name"),
+                        "colour": data.get("colour").slice(1) || null
+                    })
+
+                    allTags = await getTags();
+
+                    const tagSelection = renderDialog.querySelector(".tagSelection");
+                    tagSelection.replaceWith(renderTagsOnForm(allTags, tagInts));
+                    renderDialog2.close();
+                    bodyTag.removeChild(renderDialog2);
+                })
+
+                renderForm2.querySelector("#closeBtn").addEventListener("click", (e) => {
+                    renderDialog2.close();
+                    bodyTag.removeChild(renderDialog2);
+                })
+
             })
         })
     });
@@ -293,8 +360,9 @@ async function loadIndividualStage(stage) {
             });
 
             renderDialog.querySelector("#confirmBtn").addEventListener("click", async (e) => {
-                await deleteTask(boardId, stage.id, task.id);
-                await loadStages(boardId);
+                await deleteTask(boardId, stage.id, task.id);    
+                const stages = await getStages(boardId)
+                loadStages(stages);
                 renderDialog.close();
             bodyTag.removeChild(renderDialog);
             })

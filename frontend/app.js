@@ -251,24 +251,25 @@ async function loadIndividualStage(stage) {
             bodyTag.appendChild(renderDialog2);
             renderDialog2.showModal();
 
-            const renderForm = renderDialog2.querySelector("form");
-            renderForm.addEventListener("submit", async (e) => {
+            const renderForm2 = renderDialog2.querySelector("form");
+            renderForm2.addEventListener("submit", async (e) => {
                 e.preventDefault();
-                const data = new FormData(renderForm);
+                const data = new FormData(renderForm2);
                 await createTag({
                     "tag_name": data.get("tag_name"),
-                    "colour": data.get("colour") || null
+                    "colour": data.get("colour").slice(1) || null
                 })
 
                 allTags = await getTags();
 
                 const tagSelection = renderDialog.querySelector(".tagSelection");
                 tagSelection.replaceWith(renderTagsOnForm(allTags, tagInts));
-                
+                renderDialog2.close();
+                bodyTag.removeChild(renderDialog2);
             })
 
-            renderForm.querySelector("#closeBtn").addEventListener("click", (e) => {
-                renderDialog.close();
+            renderForm2.querySelector("#closeBtn").addEventListener("click", (e) => {
+                renderDialog2.close();
                 bodyTag.removeChild(renderDialog2);
             })
 
@@ -334,6 +335,7 @@ async function loadIndividualStage(stage) {
                     tagSelection.replaceWith(renderTagsOnForm(allTags, tagInts));
                     renderDialog2.close();
                     bodyTag.removeChild(renderDialog2);
+                    
                 })
 
                 renderForm2.querySelector("#closeBtn").addEventListener("click", (e) => {
@@ -369,7 +371,7 @@ async function loadIndividualStage(stage) {
         })
     });
 
-    // this is slightly different - it looks for checks within each stage (otherwise they event listener will repeat itself) and then updates the task
+    // this is slightly different - it looks for checks within its own stage (otherwise they event listener will repeat itself) and then updates the task
     const finishTaskChecks = document.querySelectorAll(`#stage-${stage.id} .finishTask`);
     finishTaskChecks.forEach(check => {
         // change listener instead of click

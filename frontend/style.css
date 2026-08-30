@@ -22,11 +22,12 @@ main {
 
 #stages-container {
     display: flex;
+    width: fit-content;
 }
 
 .stage {
     border: 3px #d8d8d8 solid;
-    width: 300px;
+    width: 280px;
     border-radius: 8px;
     overflow: hidden;
     margin: 0 4px

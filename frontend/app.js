@@ -338,7 +338,8 @@ async function initializeBoards(currentBoard = null) {
     const boards = await getBoards();
 
     if (boards.length) {
-        // boards.forEach((b) => createBoardStyles(b.id, b.colour ?? "FFF"));
+        // i still need this css outside of style.css because i have no way of attaching a boardId to anything because there is no "renderBoard"
+        boards.forEach((b) => createBoardStyles(b.id, b.colour ?? "FFF"));
         boardSelect.replaceChildren(renderBoardTabs(boards));
         currentBoardId = currentBoard ?? boards[0].id;
         await loadBoard(currentBoardId);

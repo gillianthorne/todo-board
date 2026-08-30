@@ -32,16 +32,18 @@ main {
     margin: 0 4px
 }
 
-.stage-details {
+.stageDetails {
     padding: 8px;
     text-align: center;
+    background-color: var(--stage-colour);
+    color: contrast-color(var(--stage-colour));
 }
 
-.stage-details h2, .stage-details p {
+.stageDetails h2, .stageDetails p {
     margin: 8px;
 }
 
-.stage-content {
+.stageContent {
     padding: 8px;
 }
 
@@ -50,6 +52,7 @@ main {
     border-radius: 4px;
     padding: 8px;
     margin-bottom: 8px;
+    color: black;
 }
 
 
@@ -66,6 +69,8 @@ main {
     padding: 4px;
     text-decoration: none;
     border-radius: 4px;
+    background-color: var(--tag-colour);
+    color: contrast-color(var(--tag-colour));
 }
 
 .task p {

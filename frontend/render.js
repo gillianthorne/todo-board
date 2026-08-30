@@ -13,11 +13,12 @@ function renderBoardTabs(boards) {
 function renderStage(stageData, tasks) {
     const stage = document.createElement("div");
     stage.classList.add("stage");
+    stage.style.setProperty("--stage-colour", `#${stageData.colour ?? "FFF"}`)
     stage.id = `stage-${stageData.id}`;
     stage.dataset.stageId = stageData.id;
     
     const stageDetails = document.createElement("div");
-    stageDetails.classList.add("stage-details");
+    stageDetails.classList.add("stageDetails");
     const stageName = document.createElement("h2");
     stageName.textContent = stageData.stage_name;
     const taskCount = document.createElement("p");
@@ -27,7 +28,7 @@ function renderStage(stageData, tasks) {
     stage.append(stageDetails);
 
     const stageContent = document.createElement("div");
-    stageContent.classList.add("stage-content");
+    stageContent.classList.add("stageContent");
     tasks.forEach((task) => stageContent.append(renderTask(task)))
     stage.append(stageContent)
 
@@ -158,12 +159,11 @@ function renderTask(task) {
 
 function renderTag(tag) {
     const tagElement = document.createElement("span");
+    tagElement.style.setProperty("--tag-colour", `#${tag.colour ?? "AAA"}`);
     const tagLink = document.createElement("a");
     tagLink.href = "#";
     tagLink.textContent = tag.tag_name;
     tagElement.appendChild(tagLink);
-    tagElement.style.backgroundColor = `#${tag.colour ?? "AAA"}`
-    tagElement.style.color = `contrast-color(#${tag.colour})`
     tagLink.style.color = "inherit"
     return tagElement;
 }

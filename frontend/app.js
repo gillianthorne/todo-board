@@ -240,7 +240,7 @@ async function loadIndividualStage(stage) {
         })
     })
     stagesContainer.append(stageRender);
-    createStageStyles(stage.id, stage.colour ?? "FFFFFF");
+    // createStageStyles(stage.id, stage.colour ?? "FFFFFF");
 
 
     // more buttons
@@ -338,7 +338,7 @@ async function initializeBoards(currentBoard = null) {
     const boards = await getBoards();
 
     if (boards.length) {
-        boards.forEach((b) => createBoardStyles(b.id, b.colour ?? "FFF"));
+        // boards.forEach((b) => createBoardStyles(b.id, b.colour ?? "FFF"));
         boardSelect.replaceChildren(renderBoardTabs(boards));
         currentBoardId = currentBoard ?? boards[0].id;
         await loadBoard(currentBoardId);

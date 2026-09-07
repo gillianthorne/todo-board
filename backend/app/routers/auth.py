@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 
 from app.auth import check_password
 from app.schemas.auth import LoginRequest
+from app.deps import require_auth
 
 router = APIRouter()
 
@@ -20,3 +21,7 @@ def login(request: Request, credentials: LoginRequest):
 def logout(request: Request):
     request.session.clear()
     return {"message": "Logged out successfully"}
+
+@router.get("/me")
+def me(_ = Depends(require_auth)):
+    return {"status": "ok"}

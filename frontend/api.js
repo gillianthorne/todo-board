@@ -162,8 +162,20 @@ async function updateTag(tagId, body) {
     return data;
 }
 
-async function deleteTag(tagId, body) {
+async function deleteTag(tagId) {
     const data = await apiFetch(`/tags/${tagId}`, "DELETE");
+    return data;
+}
+
+// --- LOGIN FUNCTIONS ---
+
+async function login(body) {
+    const data = await apiFetch("/login", "POST", body);
+    return data;
+}
+
+async function me() {
+    const data = await apiFetch("/me", "GET");
     return data;
 }
 
@@ -189,5 +201,7 @@ export {
     getTags,
     getIndividualTag,
     updateTag,
-    deleteTag
+    deleteTag,
+    login,
+    me
 }

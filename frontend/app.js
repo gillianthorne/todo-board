@@ -1,5 +1,5 @@
 import { renderStage, renderBoardTabs, renderHeader, renderBoardForm, renderFormTemplate, renderStageForm, renderDeleteAlert, renderTaskForm, renderTagForm, renderTagsOnForm } from "./render.js";
-import { getStages, getBoards, getIndividualBoard, getTasks, createBoard, updateBoard, updateStage, createStage, deleteBoard, deleteStage, createTask, getIndividualTask, updateTask, deleteTask, getTags, createTag } from "./api.js";
+import { getStages, getBoards, getIndividualBoard, getTasks, createBoard, updateBoard, updateStage, createStage, deleteBoard, deleteStage, createTask, getIndividualTask, updateTask, deleteTask, getTags, createTag, login, me } from "./api.js";
 
 let currentBoardId = null;
 const stagesContainer = document.querySelector('#stages-container');
@@ -419,6 +419,12 @@ async function initializeBoards(currentBoard = null) {
 }
 
 async function init() {
+
+    try {
+        await me();
+    } catch (err) {
+        window.location.href = "/login.html";
+    }
     console.log("running...")
 
     initializeBoards();

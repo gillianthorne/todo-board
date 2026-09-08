@@ -9,8 +9,8 @@ loginForm.addEventListener("submit", async (e) => {
 
     try {
         await login({ "password": data.get("password")});
+	console.log("login?");
         window.location.href = "/index.html";
-        init();
     } catch (err) {
         document.querySelector("#login-error").textContent = "Incorrect password."
     }

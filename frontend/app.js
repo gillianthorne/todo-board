@@ -421,8 +421,10 @@ async function initializeBoards(currentBoard = null) {
 async function init() {
 
     try {
-        await me();
+       	const isMe = await me();
+	console.log(isMe);
     } catch (err) {
+	console.log(err);
         window.location.href = "/login.html";
     }
     console.log("running...")

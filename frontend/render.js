@@ -113,7 +113,9 @@ function renderTask(task) {
         const timeDifference = deadlineDate - today;
         const daysDiff = Math.ceil(timeDifference / (1000 * 3600 * 24));
         deadline.textContent = `Due ${task.deadline.slice(0, 10)} - ${daysDiff} ${daysDiff === 1 ? "day" : "days"} remaining.`;
-        
+        deadline.classList.add("deadline");
+        if (daysDiff <= 1) deadline.classList.add("urgent");
+
         taskContainer.append(deadline);
     }
 
@@ -324,7 +326,7 @@ function renderStageForm(stage = null) {
     return container
 }
 
-function renderTaskForm(task = null, allTags) {
+function renderTaskForm(task = null, allTags, isParent = true) {
     console.log("renderTaskForm");
     const container = document.createElement("div");
 
@@ -358,53 +360,87 @@ function renderTaskForm(task = null, allTags) {
     titleInputRow.appendChild(titleInput);
     container.appendChild(titleInputRow)
 
-    const tagPickerFieldset = document.createElement("fieldset");
-    tagPickerFieldset.classList.add("tagPicker");
+    
+    // basically these things only show up if this is a parent task - i literally want subtasks to be a title, a description, and finish/edit buttons
+    if (isParent) {
+        const tagPickerFieldset = document.createElement("fieldset");
+        tagPickerFieldset.classList.add("tagPicker");
 
-    const legend = document.createElement("legend");
-    legend.textContent = "Tags: ";
-    tagPickerFieldset.appendChild(legend);
+        const legend = document.createElement("legend");
+        legend.textContent = "Tags: ";
+        tagPickerFieldset.appendChild(legend);
 
-    tagPickerFieldset.appendChild(renderTagsOnForm(allTags, task?.tags?.map(t => t.id) ?? []))
+        tagPickerFieldset.appendChild(renderTagsOnForm(allTags, task?.tags?.map(t => t.id) ?? []))
 
-    container.appendChild(tagPickerFieldset);
+        container.appendChild(tagPickerFieldset);
 
-    const addTagBtn = document.createElement("button");
-    addTagBtn.type = "button";
-    addTagBtn.textContent = "+";
-    addTagBtn.id = "addTagBtn";
+        const addTagBtn = document.createElement("button");
+        addTagBtn.type = "button";
+        addTagBtn.textContent = "+";
+        addTagBtn.id = "addTagBtn";
 
-    container.appendChild(addTagBtn);
+        container.appendChild(addTagBtn);
 
-    const descriptionInputRow = document.createElement("div");
-    descriptionInputRow.classList.add("inputRow");
-    const taskDescriptionLabel = document.createElement("label");
-    taskDescriptionLabel.htmlFor = "task_description";
-    taskDescriptionLabel.textContent = "Description:";
-    const taskDescriptionInput = document.createElement("textarea");
-    taskDescriptionInput.name = "task_description";
-    taskDescriptionInput.id = "task_description";
-    taskDescriptionInput.maxLength = 1000;
-    taskDescriptionInput.textContent = task?.task_description ?? "";
+        const descriptionInputRow = document.createElement("div");
+        descriptionInputRow.classList.add("inputRow");
+        const taskDescriptionLabel = document.createElement("label");
+        taskDescriptionLabel.htmlFor = "task_description";
+        taskDescriptionLabel.textContent = "Description:";
+        const taskDescriptionInput = document.createElement("textarea");
+        taskDescriptionInput.name = "task_description";
+        taskDescriptionInput.id = "task_description";
+        taskDescriptionInput.maxLength = 1000;
+        taskDescriptionInput.textContent = task?.task_description ?? "";
 
-    descriptionInputRow.appendChild(taskDescriptionLabel);
-    descriptionInputRow.appendChild(taskDescriptionInput);
-    container.appendChild(descriptionInputRow)
+        descriptionInputRow.appendChild(taskDescriptionLabel);
+        descriptionInputRow.appendChild(taskDescriptionInput);
+        container.appendChild(descriptionInputRow)
 
-    const deadlineInputRow = document.createElement("div");
-    deadlineInputRow.classList.add("inputRow");
-    const deadlineLabel = document.createElement("label");
-    deadlineLabel.htmlFor = "deadline";
-    deadlineLabel.textContent = "Deadline:";
-    const deadlineInput = document.createElement("input");
-    deadlineInput.name = "deadline";
-    deadlineInput.id = "deadline";
-    deadlineInput.type = "date";
-    deadlineInput.value = task?.deadline ?? "";
+        const deadlineInputRow = document.createElement("div");
+        deadlineInputRow.classList.add("inputRow");
+        const deadlineLabel = document.createElement("label");
+        deadlineLabel.htmlFor = "deadline";
+        deadlineLabel.textContent = "Deadline:";
+        const deadlineInput = document.createElement("input");
+        deadlineInput.name = "deadline";
+        deadlineInput.id = "deadline";
+        deadlineInput.type = "date";
+        deadlineInput.value = task?.deadline ?? "";
 
-    deadlineInputRow.appendChild(deadlineLabel);
-    deadlineInputRow.appendChild(deadlineInput);
-    container.appendChild(deadlineInputRow);
+        deadlineInputRow.appendChild(deadlineLabel);
+        deadlineInputRow.appendChild(deadlineInput);
+        container.appendChild(deadlineInputRow);
+
+        const subtasks = document.createElement("fieldset");
+        const subtaskLegend = document.createElement("legend");
+        legend.textContent = "Subtasks: ";
+        subtasks.appendChild(subtaskLegend);
+        const subtaskList = document.createElement("ul");
+        subtaskList.id = "subtask-list";
+        subtasks.appendChild(subtaskList);
+        const addSubtaskBtn = document.createElement("button");
+        addSubtaskBtn.type = "button";
+        addSubtaskBtn.id = "add-subtask";
+        addSubtaskBtn.textContent = "+ Add subtask";
+        subtasks.appendChild(addSubtaskBtn);
+        container.appendChild(subtasks);
+
+    } else {
+        const descriptionInputRow = document.createElement("div");
+        descriptionInputRow.classList.add("inputRow");
+        const taskDescriptionLabel = document.createElement("label");
+        taskDescriptionLabel.htmlFor = "task_description";
+        taskDescriptionLabel.textContent = "Description:";
+        const taskDescriptionInput = document.createElement("textarea");
+        taskDescriptionInput.name = "task_description";
+        taskDescriptionInput.id = "task_description";
+        taskDescriptionInput.maxLength = 1000;
+        taskDescriptionInput.textContent = task?.task_description ?? "";
+
+        descriptionInputRow.appendChild(taskDescriptionLabel);
+        descriptionInputRow.appendChild(taskDescriptionInput);
+        container.appendChild(descriptionInputRow);
+    }
 
     if (task) {
         const completionInputRow = document.createElement("div");
@@ -421,13 +457,18 @@ function renderTaskForm(task = null, allTags) {
         completionInputRow.appendChild(completionLabel);
         completionInputRow.appendChild(completionInput);
         container.appendChild(completionInputRow);
-    }
+    } 
 
     // add parent task option in m6
-    // add tags in m5
     // add recurrence functionality in m10
 
     return container;
+}
+
+function renderSubtask(subtask) {
+    const row = document.createElement("li");
+    row.classList.add("subtask-row");
+    
 }
 
 function renderTagForm() {

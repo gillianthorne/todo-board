@@ -58,20 +58,24 @@ main {
 
 
 .task h2 {
-    display: inline;
+    display: block;
+    padding: 8px 4px;
+    margin: 0;
 }
 
 .tags {
-    display: flex;
+    display: inline;
+    line-height: 2.1;
 }
 
 .tags span {
-    margin: 4px 2px;
+    margin: 0 8px 0 0;
     padding: 4px;
     text-decoration: none;
     border-radius: 4px;
     background-color: var(--tag-colour);
     color: contrast-color(var(--tag-colour));
+    box-decoration-break: clone;
 }
 
 .task p {
@@ -178,4 +182,12 @@ form {
 
 .tagPicker {
     padding: 8px;
+}
+
+.deadline {
+    font-weight: bold;
+}
+
+.deadline .urgent {
+    color: #ba2424;
 }
